@@ -5,6 +5,9 @@
  */
 package edu.eci.arsw.primefinder;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  */
@@ -34,19 +37,27 @@ public class Control extends Thread {
         return new Control();
     }
     
+    public void stopThread() throws InterruptedException{
+        synchronized(this.pft){
+            while(true){
+                if(System.currentTimeMillis()%TMILISECONDS == 0){
+                    pft.wait();
+                }
+            }
+        }
+    }
+    
+    
     @Override
     public void run() {
         for(int i = 0;i < NTHREADS;i++ ) {
             pft[i].start();
+            try {
+                stopThread();
+            } catch (Exception ex) {
+                
+            }
         }
-        synchronized(this.pft){
-            while(true){
-               if(System.currentTimeMillis()%TMILISECONDS == 0){
-                   
-               }   
-           }
-        }
-        
     }
     
 }
