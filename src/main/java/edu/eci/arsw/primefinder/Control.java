@@ -33,12 +33,20 @@ public class Control extends Thread {
     public static Control newControl() {
         return new Control();
     }
-
+    
     @Override
     public void run() {
         for(int i = 0;i < NTHREADS;i++ ) {
             pft[i].start();
         }
+        synchronized(this.pft){
+            while(true){
+               if(System.currentTimeMillis()%TMILISECONDS == 0){
+                   
+               }   
+           }
+        }
+        
     }
     
 }
