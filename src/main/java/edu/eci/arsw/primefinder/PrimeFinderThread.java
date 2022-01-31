@@ -2,30 +2,70 @@ package edu.eci.arsw.primefinder;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PrimeFinderThread extends Thread{
 
 	
 	int a,b;
+	private long inicial;
+	private final List<Integer> primes;
+        private final static int TMILISECONDS = 5000;
+       private boolean boolWait;
+        private long fin;
 	
-	private List<Integer> primes;
-	
-	public PrimeFinderThread(int a, int b) {
+	public PrimeFinderThread(int a, int b, List<Integer> primes) {
 		super();
-                this.primes = new LinkedList<>();
+                this.primes = primes;
 		this.a = a;
 		this.b = b;
 	}
 
+        /**
+         * Funcion generada para correr el hilo. Esta funcion abarca los procesos
+         * de sincronizar la lista de primos de tal manera que no haya errores por
+         * los hilos. Si no se cumple el tiempo, revisa si el numero es primo y lo inserta
+         */
         @Override
 	public void run(){
-            for (int i= a;i < b;i++){						
-                if (isPrime(i)){
-                    primes.add(i);
-                    System.out.println(i);
+            System.out.println("EMPIEZAN A BUSCAR");
+            //Se dejan dos variables de tiempo, la variable fin se va actualizando
+            //hasta que lleguemos a N segundos. 
+            this.inicial = System.currentTimeMillis();
+            this.fin = System.currentTimeMillis();
+            synchronized(this.primes){
+                for (int i= a;i < b;i++){ 
+                    /**Aun no cumple los N segundos*/
+                    if(this.fin - this.inicial <= TMILISECONDS){
+                        this.boolWait = false;
+                       // System.out.println(this.fin-this.inicial);
+                        if(isPrime(i)){
+                            this.primes.add(i);
+                            System.out.println("NO LLEGO AL LIMITE DE TIEMPO "+(this.fin-this.inicial));
+                            this.fin = System.currentTimeMillis();
+                        }
+                    }
+                    /**Cumple los N segundos */
+                    else{
+                        System.out.println("LLEGO AL LIMITE DE TIEMPO "+(this.fin-this.inicial));
+                        try{
+                            /**No deja que inserten mas valores a la lista de primos*/
+                            
+                            this.boolWait = true;
+                            this.primes.wait();
+                            this.inicial = System.currentTimeMillis();
+                            
+                        } catch (InterruptedException ex){}
+                    }  
                 }
-            }
+            }  
 	}
+        
+        public boolean waiting(){
+            return boolWait;
+        }
+        
 	
 	boolean isPrime(int n) {
 	    boolean ans;
