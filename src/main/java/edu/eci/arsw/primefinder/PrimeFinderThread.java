@@ -29,7 +29,7 @@ public class PrimeFinderThread extends Thread{
          */
         @Override
 	public void run(){
-            System.out.println("EMPIEZAN A BUSCAR");
+          
             //Se dejan dos variables de tiempo, la variable fin se va actualizando
             //hasta que lleguemos a N segundos. 
             this.inicial = System.currentTimeMillis();
@@ -42,20 +42,19 @@ public class PrimeFinderThread extends Thread{
                        // System.out.println(this.fin-this.inicial);
                         if(isPrime(i)){
                             this.primes.add(i);
-                            System.out.println("NO LLEGO AL LIMITE DE TIEMPO "+(this.fin-this.inicial));
+                            //System.out.println("NO LLEGO AL LIMITE DE TIEMPO "+(this.fin-this.inicial));
+                            System.out.println("TAMAÑO DE LA LISTA"+getPrimes().size());
+                            //System.out.println(i);
                             this.fin = System.currentTimeMillis();
                         }
                     }
                     /**Cumple los N segundos */
                     else{
                         System.out.println("LLEGO AL LIMITE DE TIEMPO "+(this.fin-this.inicial));
+                        this.boolWait = true;
                         try{
                             /**No deja que inserten mas valores a la lista de primos*/
-                            
-                            this.boolWait = true;
                             this.primes.wait();
-                            this.inicial = System.currentTimeMillis();
-                            
                         } catch (InterruptedException ex){}
                     }  
                 }
@@ -64,6 +63,14 @@ public class PrimeFinderThread extends Thread{
         
         public boolean waiting(){
             return boolWait;
+        }
+        
+        public void reRun(){
+            this.boolWait = false;
+        }
+        
+        public void setInicial(long num){
+            this.inicial = num;
         }
         
 	
@@ -85,3 +92,4 @@ public class PrimeFinderThread extends Thread{
 	}
 	
 }
+
